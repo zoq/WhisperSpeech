@@ -409,13 +409,13 @@ class TSARTransformer(nn.Module):
             l.setup_kv_cache(max_batch_size, self.stoks_len, self.ttoks_len)
         self.switch_dtypes(dtype)
         if torch_compile:
-            self.generate_next = torch.compile(self.generate_next, mode="reduce-overhead", fullgraph=True)
+            self.generate_next = torch.compile(self.generate_next, mode="max-autotune", fullgraph=True)
             
     def optimize_training(self):
         # breaks with: Error: accessing tensor output of CUDAGraphs that has been overwritten by a subsequent run.
         # somewhere inside LayerNorm???
-        self.encoder = torch.compile(self.encoder, fullgraph=True, mode="reduce-overhead")
-        self.decoder = torch.compile(self.decoder, fullgraph=True, mode="reduce-overhead")
+        self.encoder = torch.compile(self.encoder, fullgraph=True, mode="max-autotune")
+        self.decoder = torch.compile(self.decoder, fullgraph=True, mode="max-autotune")
 
     @property
     def device(self):

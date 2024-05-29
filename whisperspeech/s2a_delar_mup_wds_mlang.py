@@ -470,11 +470,11 @@ class SADelARTransformer(nn.Module):
             l.setup_kv_cache(max_batch_size, self.ctx_n, self.stoks_len)
         self.switch_dtypes(dtype)
         if torch_compile:
-            self.generate_next = torch.compile(self.generate_next, mode="reduce-overhead", fullgraph=True)
+            self.generate_next = torch.compile(self.generate_next, mode="max-autotune", fullgraph=True)
             
     def optimize_training(self):
-        self.decoder = torch.compile(self.decoder, fullgraph=True, mode="reduce-overhead")
-        self._encoder = torch.compile(self._encoder, fullgraph=True, mode="reduce-overhead")
+        self.decoder = torch.compile(self.decoder, fullgraph=True, mode="max-autotune")
+        self._encoder = torch.compile(self._encoder, fullgraph=True, mode="max-autotune")
 
     @property
     def device(self):
